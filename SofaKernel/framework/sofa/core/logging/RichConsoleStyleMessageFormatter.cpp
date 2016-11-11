@@ -30,9 +30,11 @@
 * in the messaging.h file.
 ******************************************************************************/
 
+#include <sofa/helper/logging/RichConsoleStyleMessageFormatter.h>
+using sofa::helper::logging::RichConsoleStyleMessageFormatter;
 
-#include "RichConsoleStyleMessageFormatter.h"
-#include "Message.h"
+#include <sofa/core/objectmodel/Base.h>
+using  sofa::core::objectmodel::Base ;
 
 #include <sofa/helper/system/console.h>
 #include <sofa/helper/fixed_array.h>
@@ -248,8 +250,9 @@ void RichConsoleStyleMessageFormatter::formatMessage(const Message& m, std::ostr
     {
         if( m.componentInfo() )
         {
-            psize +=m.sender().size()+m.componentInfo()->m_name.size()+5 ;
-            out << Console::BLUE << "[" << m.sender()<< "(" << m.componentInfo()->m_name << ")] ";
+            const Base* b = m.componentInfo()->getBase() ;
+            psize +=m.sender().size()+b->getName().size()+5 ;
+            out << Console::BLUE << "[" << m.sender()<< "(" << b->getName() << ")] ";
         }
         else
         {

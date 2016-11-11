@@ -49,11 +49,6 @@ using std::remove ;
 #include "MessageHandler.h"
 #include "ConsoleMessageHandler.h"
 
-#include <sofa/core/objectmodel/Base.h>
-
-#include <sofa/helper/logging/RichConsoleStyleMessageFormatter.h>
-using sofa::helper::logging::RichConsoleStyleMessageFormatter;
-
 #include <mutex>
 using std::lock_guard ;
 using std::mutex;
@@ -68,7 +63,7 @@ namespace logging
 {
 
 MessageHandler* getDefaultMessageHandler(){
-    static ConsoleMessageHandler s_consoleMessageHandler(new RichConsoleStyleMessageFormatter());
+    static ConsoleMessageHandler s_consoleMessageHandler;
     return &s_consoleMessageHandler ;
 }
 
@@ -218,7 +213,7 @@ MessageDispatcher::LoggerStream::LoggerStream(Message::Class mclass, Message::Ty
              const sofa::core::objectmodel::Base* sender, const FileInfo::SPtr& fileInfo)
     : m_message( mclass
                  , type
-                 , sender->getClassName()
+                 , ""
                  // temporary, until Base object reference kept in the message itself ->
                  // (mattn) not sure it is a good idea, the Message could be kept after the Base is deleted
                  // TODO(dmarchal): by converting this to a string we are not able anymore to
@@ -226,15 +221,7 @@ MessageDispatcher::LoggerStream::LoggerStream(Message::Class mclass, Message::Ty
                  // information are really usefull. I have to make small experiment to see what could be a nice
                  // approach without too much overhead.
                  , fileInfo
-
-//TODO(dmarchal): this is a dirty fix to make the source code compile on windows which fail at link
-//time. More fundamentally this function should'nt be in the message dispatcher class that is supposed
-//to have no link to sofa::core::objectmodel::Base
-#ifdef WIN32
-                 , ComponentInfo::SPtr( new ComponentInfo("", "")) )
-#else
-                 , ComponentInfo::SPtr( new ComponentInfo("" /*sender->getName()*/, "")) )
-#endif //WIN32
+                 , ComponentInfo::SPtr( new ComponentInfo(sender)) )
 {
 }
 

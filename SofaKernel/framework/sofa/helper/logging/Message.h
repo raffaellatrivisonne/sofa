@@ -42,6 +42,18 @@
 
 namespace sofa
 {
+namespace core
+{
+namespace objectmodel
+{
+    class Base; // forward declaration
+} // namespace objectmodel
+} // namespace core
+} // namespace sofa
+
+
+namespace sofa
+{
 
 namespace helper
 {
@@ -91,22 +103,25 @@ struct FileInfoOwningFilename : public FileInfo
 };
 
 
+using sofa::core::objectmodel::Base ;
+
 /// To keep track component informations associated with a message.
 struct ComponentInfo
 {
 public:
     typedef boost::shared_ptr<ComponentInfo> SPtr;
 
-    std::string m_name ;
-    std::string m_path ;
+    const Base* m_object ;
 
-    ComponentInfo(const std::string& name, const std::string& path)
+    ComponentInfo(const Base* b=nullptr)
     {
-        m_name = name ;
-        m_path = path ;
+        m_object = b;
     }
 
+    const Base* getBase(){ return m_object; }
 };
+
+
 
 static FileInfo::SPtr EmptyFileInfo(new FileInfo(s_unknownFile, 0)) ;
 

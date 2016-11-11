@@ -117,9 +117,6 @@ public:
             static const NullLoggerStream& getInstance(){ static const NullLoggerStream s_nop; return s_nop; }
         };
 
-
-
-
         static int addHandler(MessageHandler* o) ; ///< to add a MessageHandler
         static int rmHandler(MessageHandler* o) ; ///< to remove a MessageHandler
         static void clearHandlers() ; ///< to remove every MessageHandlers

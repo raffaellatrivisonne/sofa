@@ -20,20 +20,22 @@
 *                                                                             *
 * This component is open-source                                               *
 *                                                                             *
-* Authors: Damien Marchal                                                     *
-*          Bruno Carrez                                                       *
+* Contributors:                                                               *
+*    - damien.marchal@univ-lille1.fr                                          *
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 /*****************************************************************************
 * User of this library should read the documentation
-* in the TextMessaging.h file.
+* in the messaging.h file.
 ******************************************************************************/
-#define SOFA_MESSAGE_CPP
-#include "Message.h"
-
-using std::endl ;
-using std::string ;
+#ifndef RICHCONSOLESTYLEMESSAGEFORMATTER_H
+#define RICHCONSOLESTYLEMESSAGEFORMATTER_H
+#include <sstream>
+#include <string>
+#include <sofa/helper/logging/Message.h>
+#include <sofa/helper/logging/RichConsoleStyleMessageFormatter.h>
+#include <sofa/helper/helper.h>
 
 namespace sofa
 {
@@ -44,74 +46,46 @@ namespace helper
 namespace logging
 {
 
-Message Message::emptyMsg(CEmpty, TEmpty, "", EmptyFileInfo) ;
-
-Message::Message(Class mclass, Type type,
-                 const string& sender,
-                 const FileInfo::SPtr& fileInfo,
-                 const ComponentInfo::SPtr& componentInfo
-                 ):
-    m_sender(sender),
-    m_fileInfo(fileInfo),
-    m_componentinfo(componentInfo),
-    m_class(mclass),
-    m_type(type),
-    m_id(-1)
+namespace richconsolestylemessageformater
 {
-}
 
-Message::Message( const Message& msg )
-    : m_sender(msg.sender())
-    , m_fileInfo(msg.fileInfo())
-    , m_componentinfo(msg.componentInfo())
-    , m_class(msg.context())
-    , m_type(msg.type())
+///
+/// \brief The RichConsoleStyleMessageFormatter class
+///
+///  The class implement a message formatter dedicated to console pretty printing on a console
+///  Among other thing it feature formatting using a markdown like syntax:
+///     - color rendering, 'italics' or *italics*
+///     - alignement and wrapping for long message that are then much easier to read.
+///     - automatic reading of the console number of column for prettier display.
+///
+///
+class SOFA_HELPER_API RichConsoleStyleMessageFormatter : public MessageFormatter
 {
-    m_stream << msg.message().str();
-}
+public:
+    virtual void formatMessage(const Message& m,std::ostream& out);
 
-Message& Message::operator=( const Message& msg )
+    RichConsoleStyleMessageFormatter();
+};
+
+/// Singleton based façade to RichConsoleStyleMessageFormatter.
+class SOFA_HELPER_API MainRichConsoleStyleMessageFormatter
 {
-    m_sender = msg.sender();
-    m_fileInfo = msg.fileInfo();
-    m_componentinfo = msg.componentInfo();
-    m_class = msg.context();
-    m_type = msg.type();
-    m_stream << msg.message().str();
-    return *this;
-}
+public:
+    static void formatMessage(const Message& m,std::ostream& out)
+    {
+        static RichConsoleStyleMessageFormatter formatter ;
+        formatter.formatMessage(m, out) ;
+    }
+};
 
 
-std::ostream& operator<< (std::ostream& s, const Message& m){
-    s << "[" << m.sender() << "]: " << endl ;
-    s << "    Message type   : " << m.type() << endl ;
-    s << "    Message content: " << m.message().str() << endl ;
+} // richconsolestylemessageformater
 
-    if(m.fileInfo())
-        s << "    source code loc: " << m.fileInfo()->filename << ":" << m.fileInfo()->line << endl ;
-    //if(m.componentInfo())
-    //    s << "      component: " << m.componentInfo()->m_name << " at " << m.componentInfo()->m_path << endl ;
-
-    return s;
-}
-
-bool Message::empty() const
-{
-    // getting the size without creating a copy like m_stream.str().size()
-    std::streambuf* buf = m_stream.rdbuf();
-
-    // the current position to restore it after
-    std::stringstream::pos_type cur = buf->pubseekoff(0, std::ios_base::cur);
-
-    // go to the end
-    std::stringstream::pos_type end = buf->pubseekoff(0, std::ios_base::end);
-
-    // restore initial position
-    buf->pubseekpos(cur, m_stream.out);
-
-    return end <= 0;
-}
+using richconsolestylemessageformater::MainRichConsoleStyleMessageFormatter ;
+using richconsolestylemessageformater::RichConsoleStyleMessageFormatter ;
 
 } // logging
 } // helper
 } // sofa
+
+#endif // DEFAULTSTYLEMESSAGEFORMATTER_H

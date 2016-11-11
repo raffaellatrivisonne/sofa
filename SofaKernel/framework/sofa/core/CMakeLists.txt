@@ -139,6 +139,7 @@ set(HEADER_FILES
     visual/VisualManager.h
     visual/VisualModel.h
     visual/VisualParams.h
+    logging/RichConsoleStyleMessageFormatter.h
 )
 
 set(SOURCE_FILES
@@ -232,6 +233,7 @@ set(SOURCE_FILES
     visual/VisualManager.cpp
     visual/VisualModel.cpp
     visual/VisualParams.cpp
+    logging/RichConsoleStyleMessageFormatter.cpp
 )
 
 if(NOT SOFA_NO_OPENGL)
